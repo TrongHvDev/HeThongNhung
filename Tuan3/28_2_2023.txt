@@ -1,0 +1,164 @@
+Bai1: 
+#include <stdio.h>
+#include <wiringPi.h>
+#include <softPwm.h>
+#include <stdint.h>
+#define RED 2
+#define GREEN 1
+#define BLUE 3
+
+uint8_t led[3] ={2,1,3};
+int main(void)
+{
+	wiringPiSetup();
+	pinMode(RED, OUTPUT);
+	pinMode(GREEN, OUTPUT);
+	pinMode(BLUE, OUTPUT);
+    
+	softPwmCreate (RED, 0, 100);
+	softPwmCreate (GREEN, 0, 100);
+	softPwmCreate (BLUE, 0, 100);
+	
+	softPwmWrite(RED, 0);
+	softPwmWrite(GREEN, 0);
+	softPwmWrite(BLUE, 0);
+    while(1)
+	{	    
+
+	for(int i = 0;i<3;i++)
+		{
+		for(int j = 0; j <= 100; j++)
+			{
+			softPwmWrite(led[i], j);
+			delay(10);
+	    	}
+		for(int j = 100; j >= 0; j--)
+			{
+			softPwmWrite(led[i], j);
+			delay(10);
+	    	}
+		}
+	}
+return 0;
+
+}
+
+Bai 2:
+
+#include <stdio.h>
+#include <wiringPi.h>
+#include <softPwm.h>
+#include <stdint.h>
+#define RED     2
+#define GREEN   1
+#define BLUE    3
+#define BT1     0
+#define BT2     21
+#define BT3     22
+#define BT4     23
+
+int main(void)
+{
+	wiringPiSetup();
+	pinMode(RED, OUTPUT);
+	pinMode(GREEN, OUTPUT);
+	pinMode(BLUE, OUTPUT);    
+	softPwmCreate (RED, 0, 100);
+		
+	softPwmWrite(RED, 0);
+	digitalWrite(GREEN, 0);
+	digitalWrite(BLUE, 0);
+    
+    while(1)
+	{	    
+        if(digitalRead(BT1) == 1)   softPwmWrite(RED, 25);
+        if(digitalRead(BT2) == 1)   softPwmWrite(RED, 50);
+        if(digitalRead(BT3) == 1)   softPwmWrite(RED, 75);
+        if(digitalRead(BT4) == 1)   softPwmWrite(RED, 100);
+	
+	}
+return 0;
+
+}
+
+Bai 3: 
+
+#include <stdio.h>
+#include <wiringPi.h>
+#include <softPwm.h>
+#include <stdint.h>
+
+// LED Pin - wiringPi pin 0 is BCM_GPIO 17.
+#define Red     2
+#define Green   1
+#define Blue    3
+#define BT1     0   //Thay doi mau
+#define BT2     21  //Lon len
+#define BT3     22  //Nho lai
+#define BT4     23
+
+uint8_t led[3] = {2,1,3};
+uint8_t color = 0;
+int16_t x = 0;
+
+uint8_t r[8] ={0,100,0,0,100,0,100,100};
+uint8_t g[8] ={0,0,100,0,100,100,0,100};
+uint8_t b[8] ={0,0,0,100,0,100,100,100};
+
+uint8_t bt[3] = {0,21,22};
+
+void ngat_bt1(void)
+{
+   while((digitalRead(BT1) == HIGH)){}
+   
+   color += 1;
+   softPwmWrite (led[0],(r[color])) ;
+   softPwmWrite (led[1],(g[color])) ;
+   softPwmWrite (led[2],(b[color])) ;
+   
+   if(color >7)
+   {
+      color = 0;
+   }
+}
+
+void ngat_bt2(void)
+{
+   x = x + 0.1;
+   if(x==1){x=1;}
+}
+
+void ngat_bt3(void)
+{
+   x = x - 0.1;
+   if(x==0){x=0;}
+}
+
+int main (void) 
+{
+   wiringPiSetup();
+
+   pinMode (BT1, INPUT);
+   pinMode (BT2, INPUT);
+   pinMode (BT3, INPUT);
+
+   pinMode (Blue, OUTPUT);
+   pinMode (Green, OUTPUT);
+   pinMode (Red, OUTPUT);
+   
+   softPwmCreate(Red,0,100);
+   softPwmCreate(Green,0,100);
+   softPwmCreate(Blue,0,100);
+   
+   //Khai bao ngat
+   wiringPiISR(BT1,INT_EDGE_RISING,&ngat_bt1);
+   wiringPiISR(BT2,INT_EDGE_RISING,&ngat_bt2);
+   wiringPiISR(BT3,INT_EDGE_RISING,&ngat_bt3);
+   
+   while(1) 
+   {}
+   
+return 0 ;
+}
+	
+
